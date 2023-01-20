@@ -1,5 +1,5 @@
 book_filename: "bookdownproj"
-output_dir: docs
+output_dir: ../docs
 delete_merged_file: true
 edit: https://github.com/vishu-tyagi/Chess-Gender-Gap/edit/master/%s
 view: https://github.com/vishu-tyagi/Chess-Gender-Gap/blob/master/%s
