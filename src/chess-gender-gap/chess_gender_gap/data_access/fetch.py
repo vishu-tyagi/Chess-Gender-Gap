@@ -59,6 +59,17 @@ def parseXML(
     for attribute, dtype in columns:
         if dtype != str:
             df[attribute] = df[attribute].astype(dtype)
+    nrows = df.shape[0]
+    logger.info(f'Found {nrows} players')
+    logger.info(
+        f'Removing junior players born after 2000 to get more reliable ratings ...'
+    )
+    df = df[~df.birthday.isna()].copy()
+    df = df[~(df.birthday > 2002)].copy()
+    df.reset_index(inplace=True, drop=True)
+    logger.info(
+        f'Number of players left: {df.shape[0]}, {((nrows-df.shape[0])/nrows)*100:.4}% decrease'
+    )
     df.to_csv(save_path, index=False)
     logger.info(f'Saved to {save_path}')
     return
@@ -66,11 +77,11 @@ def parseXML(
 
 @timing
 def fetch():
-    url = 'http://ratings.fide.com/download/standard_rating_list_xml.zip'
+    url = 'http://ratings.fide.com/download/standard_dec22frl_xml.zip'
     current_path = Path(os.getcwd())
     data_path = Path(os.path.join(current_path, 'data'))
     data_path.mkdir(parents=True, exist_ok=True)
-    fname = 'standard_rating_list'
+    fname = 'standard_dec22frl_xml'
     zip_path = Path(os.path.join(data_path, f'{fname}.zip'))
     xml_path = Path(os.path.join(data_path, f'{fname}.xml'))
     csv_path = Path(os.path.join(data_path, f'{fname}.csv'))
@@ -79,7 +90,7 @@ def fetch():
     columns = \
         [
             ('fideid', int), ('name', str), ('country', str), ('sex', str),
-            ('title', str), ('w_title', str), ('rating', int), ('birthday', float)
+            ('title', str), ('rating', int), ('birthday', float)
         ]
     parseXML(xml_path, columns, csv_path)
     return

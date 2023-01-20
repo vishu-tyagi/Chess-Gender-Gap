@@ -1,11 +1,592 @@
-# Hello bookdown 
+```{r, setup, echo = FALSE}
+library(tidyverse)
+library(ggplot2)
+```
 
-All chapters start with a first-level heading followed by your chapter title, like the line above. There should be only one first-level heading (`#`) per .Rmd file.
+# Is there gender gap in Chess?
 
-## A section
+## FIDE Ratings
 
-All chapter sections start with a second-level (`##`) or higher heading followed by your section title, like the sections above and below here. You can have as many as you want within a chapter.
+I downloaded the [Dec 2022, FIDE Standard rating list](http://ratings.fide.com/download/standard_dec22frl_xml.zip) in XML format and parsed it as CSV in Python and removed all junior players born after 2002. See here for the [github repository](https://github.com/vishu-tyagi/Chess-Gender-Gap). This is how it looks like,
 
-### An unnumbered section {-}
+```{r, echo = FALSE}
+df = read.csv("../data/standard_dec22frl_xml.csv")
+head(df, n=3)
+```
 
-Chapters and sections are numbered by default. To un-number a heading, add a `{.unnumbered}` or the shorter `{-}` at the end of the heading, like in this section.
+```{r, echo = FALSE}
+nrows = nrow(df)
+cat(
+    "Number of players:", prettyNum(nrows, big.mark = ",", scientific = FALSE)
+)
+```
+
+
+
+```{r, echo=FALSE, fig.width=6, fig.height=4, fig.align="center"}
+p1 = ggplot(df, aes(x=rating, color=sex)) +
+    geom_density() +
+    labs(
+        title = paste('Rating Distribution by Sex'),
+        x = 'FIDE Rating Dec 2022',
+        y = 'Proportion of Players'
+    ) + 
+    theme(
+        plot.title = element_text(hjust = 0.5, face="bold"),
+        text=element_text(size=10),
+        panel.border = element_rect(colour = "black", fill=NA, size=1)
+    ) +
+    guides(color=guide_legend(title="Sex"))
+p1
+```
+
+
+The above graph shows that the proportion of female chess players in any given rating interval is roughly equal to the proportion of male chess players. However, we notice that the female rating distribution lies to the left of male.
+
+Hence, the **research question** is,
+
+* whether the two distributions are same, and the shift is due to random chance, or
+* the ratings of male chess players tend to be larger compared to female players and the shift is (statistically) significant
+
+
+## Hypothesis
+
+Let M and F be the underlying unspecified distributions for the ratings of male and female players, respectively. We assume,
+
+- the ratings of male players are independent of each other
+- the ratings of female players are independent of each other
+- the ratings of male players are independent of the female players
+
+These assumptions are speculative because the FIDE rating system is based on a player's performance relative to other players and not on their absolute skill level. For instance, most female players tend to play in an only-female pool with a relatively lower rating cap than the open pool. Players will tend to have lower ratings if a pool has a lower rating cap than a pool with a higher cap.
+
+Keeping this in mind, we devise the following one-sided test to answer the research question,
+
+* **Null Hypothesis:** M = F, the two distributions are same
+
+* **Alternative Hypothesis:** Ratings from M tend to be larger than ratings from F
+
+### Test Statistic
+
+Under the Null Hypothesis, all ratings are independent and identically distributed. If we sample (without replacement) as many ratings as there are female players, the sampled ratings are equally likely to be the ratings of female players.
+
+Because the alternative hypothesis is that ratings from distribution F tend to be smaller than ratings from distribution M, a reasonable test would be to
+
+- reject the null hypothesis if  the sum of sampled ratings is smaller than might be expected by chance
+
+Hence, we choose $\sum\limits_i F_i$ as our test statistic where $F_i$ are ratings of female players
+
+### p-value
+
+* The probability of observing results as extreme as the observed results under the Null probability model. 
+* That is, $\text{Pr}(\sum\limits_i F_i) < t$, where $t$ is the observed test statistic, which is the sum of actual ratings of female players.
+
+### Procedure
+
+* Assume the Null hypothesis is true and create the corresponding Null probability model.
+* Test whether the observed sum of ratings is a reasonable outcome of the Null probability model.
+* Or whether the observed sum of ratings is within the random variability of the Null model.
+
+### Significance Level / Type I error (α)
+
+* The probability of rejecting a true Null hypothesis.
+* Must be defined before the experiment.
+* We will set α = 0.05
+
+### Type II error (β)
+
+* The probability of failing to reject a false Null hypothesis.
+* **Power (1-β):** The probability of rejecting a false Null hypothesis.
+
+### Decision
+
+* α ≥ p-value: Reject the Null hypothesis, and conclude enough evidence to claim the ratings of male players tend to be larger than those of female players
+* α < p-value: Fail to reject the Null hypothesis, and conclude lack thereof
+
+### Permutation Test
+
+* Non-parametric procedure, makes no specific assumptions about the form of any underlying probability distributions
+* Assumes the data is independent and identically distributed (i.i.d) under the null hypothesis
+* Given the size of data, full permutation test will not be possible. We will stick to randomization test.
+
+## Statistical Analysis
+
+### Observation
+
+```{r, echo = TRUE}
+T_ratings = df$rating   # All ratings
+M_ratings = df[df$sex=='M',]$rating   # Ratings of male players
+F_ratings = df[df$sex=='F',]$rating   # Ratings of female players
+```
+
+```{r, echo = TRUE}
+T_count = length(T_ratings)    # Total players
+M_count = length(M_ratings)    # Number of male players
+F_count = length(F_ratings)    # Number of female players
+```
+
+```{r, echo = FALSE}
+cat(
+    "Total players\t\t\t\t\t:", prettyNum(T_count, big.mark = ",", scientific = FALSE),
+    "\nNumber of male chess players\t\t:", prettyNum(M_count, big.mark = ",", scientific = FALSE),
+    "\nNumber of female chess players\t:", prettyNum(F_count, big.mark = ",", scientific = FALSE)
+)
+```
+
+```{r, echo = TRUE}
+M_observed = sum(M_ratings)   # Sum of ratings of male players
+F_observed = sum(F_ratings)   # Sum of ratings of female players
+t_observed = F_observed       # Observed test statistic
+```
+
+```{r, echo = FALSE}
+cat(
+    "Observed sum of male ratings\t\t:", prettyNum(M_observed, big.mark = ",", scientific = FALSE),
+    "\nObserved sum of female ratings\t:", prettyNum(F_observed, big.mark = ",", scientific = FALSE),
+    "\nObserved test statistic\t\t\t:", prettyNum(t_observed, big.mark = ",", scientific = FALSE)
+)
+```
+
+### Permutation Step
+
+```{r, echo = TRUE}
+set.seed(0) # For reproducibility
+T_ratings = sample(T_ratings)     # Shuffle all ratings once
+F_ratings = sample(T_ratings, size=F_count, replace=FALSE)  # Sample female ratings
+t = sum(F_ratings)  # Calculate test statistic
+```
+
+```{r, echo = FALSE}
+cat(
+    "(1) Resampled test statistic\t:", prettyNum(t, big.mark = ",", scientific = FALSE),
+    "\n(2) Observed test statistic\t:", prettyNum(t_observed, big.mark = ",", scientific = FALSE)
+)
+```
+
+### Repeating Permutation Step
+
+```{r, echo = TRUE}
+# Repeat steps a 'large number of times' (p)
+p = 1000 # Number of permutations
+perm_res = rep(0, p)  # Vector for saving permutation results
+for (i in 1:p) {
+  F_ratings = sample(T_ratings, size=F_count, replace=FALSE)  # Sample female ratings
+  t = sum(F_ratings)  # Calculate test statistic
+  perm_res[i] = t   # Save test statistic
+}
+```
+
+### p-value
+
+```{r, echo = TRUE}
+# One way hypothesis test (Null: M = F, Alternative: M > F)
+extreme_count = sum(perm_res <= t_observed)
+```
+
+```{r, echo = FALSE}
+cat(
+    "Number of permutations\t\t\t:", prettyNum(p, big.mark = ",", scientific = FALSE),
+    "\nOne-way: Extreme count\t\t\t:", extreme_count,
+    "\nOne-way: Extreme ratio (p-value)\t:", extreme_count / p
+)
+```
+
+
+```{r, echo = FALSE, fig.width=6, fig.height=4, fig.align="center"}
+df2 = data.frame(perm_res=perm_res)
+plt = ggplot(df2, aes(x=perm_res)) +
+    geom_density(fill = "grey") +
+    xlim(min(df2$perm_res)-30, max(df2$perm_res)+30)
+d = ggplot_build(plt)$data[[1]]
+pval = extreme_count / p
+plt = plt +
+  labs(
+      title = paste("One-way Test # Perm. =", prettyNum(p, big.mark = ",", scientific = FALSE), ", p-value =", pval),
+      x = paste("Test Statistic (Observed:", prettyNum(t_observed, big.mark = ",", scientific = FALSE), ")"),
+      y = "Density"
+  ) +
+  theme(
+      plot.title = element_text(hjust = 0.5, face="bold"),
+      text=element_text(size=10),
+      panel.border = element_rect(colour = "black", fill=NA, size=1)
+  )
+plt
+```
+
+### Decision
+
+We reject the Null hypothesis and conclude the ratings of male players tend to be larger than those of female players.
+
+## Case of India
+
+Let's do the same analysis for Indian chess players
+
+```{r, echo=FALSE}
+df = read.csv("../data/standard_dec22frl_xml.csv")
+df = df[df$country=='IND',]
+```
+
+```{r, echo=FALSE, fig.width=6, fig.height=4, fig.align="center"}
+p1 = ggplot(df, aes(x=rating, color=sex)) +
+    geom_density() +
+    labs(
+        title = paste('Federation: IND - Rating Distribution by Sex'),
+        x = 'FIDE Rating Dec 2022',
+        y = 'Proportion of Players'
+    ) + 
+    theme(
+        plot.title = element_text(hjust = 0.5, face="bold"),
+        text=element_text(size=10),
+        panel.border = element_rect(colour = "black", fill=NA, size=1)
+    ) +
+    guides(color=guide_legend(title="Sex"))
+p1
+```
+
+### Observation
+```{r, echo = FALSE}
+T_ratings = df$rating   # All ratings
+M_ratings = df[df$sex=='M',]$rating   # Ratings of male players
+F_ratings = df[df$sex=='F',]$rating   # Ratings of female players
+```
+
+```{r, echo = FALSE}
+T_count = length(T_ratings)    # Total players
+M_count = length(M_ratings)    # Number of male players
+F_count = length(F_ratings)    # Number of female players
+```
+
+```{r, echo = FALSE}
+cat(
+    "Total players\t\t\t\t\t:", prettyNum(T_count, big.mark = ",", scientific = FALSE),
+    "\nNumber of male chess players\t\t:", prettyNum(M_count, big.mark = ",", scientific = FALSE),
+    "\nNumber of female chess players\t:", prettyNum(F_count, big.mark = ",", scientific = FALSE)
+)
+```
+
+```{r, echo = FALSE}
+M_observed = sum(M_ratings)   # Sum of ratings of male players
+F_observed = sum(F_ratings)   # Sum of ratings of female players
+t_observed = F_observed       # Observed test statistic
+```
+
+```{r, echo = FALSE}
+cat(
+    "Observed sum of male ratings\t\t:", prettyNum(M_observed, big.mark = ",", scientific = FALSE),
+    "\nObserved sum of female ratings\t:", prettyNum(F_observed, big.mark = ",", scientific = FALSE),
+    "\nObserved test statistic\t\t\t:", prettyNum(t_observed, big.mark = ",", scientific = FALSE)
+)
+```
+
+```{r, echo = FALSE}
+# Repeat steps a 'large number of times' (p)
+T_ratings = sample(T_ratings)     # Shuffle all ratings once
+p = 1000 # Number of permutations
+perm_res = rep(0, p)  # Vector for saving permutation results
+for (i in 1:p) {
+  F_ratings = sample(T_ratings, size=F_count, replace=FALSE)  # Sample female ratings
+  t = sum(F_ratings)  # Calculate test statistic
+  perm_res[i] = t   # Save test statistic
+}
+```
+
+### p-value
+```{r, echo = FALSE}
+# One way hypothesis test (Null: M = F, Alternative: M > F)
+extreme_count = sum(perm_res <= t_observed)
+```
+
+```{r, echo = FALSE}
+cat(
+    "Number of permutations\t\t\t:", prettyNum(p, big.mark = ",", scientific = FALSE),
+    "\nOne-way: Extreme count\t\t\t:", extreme_count,
+    "\nOne-way: Extreme ratio (p-value)\t:", extreme_count / p
+)
+```
+
+```{r, echo = FALSE, fig.width=6, fig.height=4, fig.align="center"}
+df2 = data.frame(perm_res=perm_res)
+plt = ggplot(df2, aes(x=perm_res)) +
+    geom_density(fill = "grey") +
+    xlim(min(df2$perm_res)-30, max(df2$perm_res)+30)
+d = ggplot_build(plt)$data[[1]]
+pval = extreme_count / p
+plt = plt +
+  geom_area(data = subset(d, x < t_observed), aes(x=x, y=y), fill="#e18009") +
+  geom_vline(aes(xintercept = t_observed), color="red", linetype="dashed", size=.5) +
+  labs(
+      title = paste("Federation: IND, One-way: # Perm. =", prettyNum(p, big.mark = ",", scientific = FALSE), ", p-value =", pval),
+      x = paste("Test Statistic (Observed:", prettyNum(t_observed, big.mark = ",", scientific = FALSE), ")"),
+      y = "Density"
+  ) +
+  theme(
+      plot.title = element_text(hjust = 0.5, face="bold"),
+      text=element_text(size=10),
+      panel.border = element_rect(colour = "black", fill=NA, size=1)
+  )
+plt
+```
+
+### Decision
+
+We conclude lack of evidence to support the claim that in India, male players tend to have a larger rating than female players. This makes me proud as an avid follower of the chess scene in India.
+
+## Comparing Top Players
+
+We can also compare top rated male and female players
+
+```{r echo=FALSE}
+df = read.csv("../data/standard_dec22frl_xml.csv")
+```
+
+```{r, echo = FALSE}
+top_male_player = df[which(df$rating==max(df[df$sex=='M',]$rating) & df$sex=='M'),]
+top_female_player = df[which(df$rating==max(df[df$sex=='F',]$rating) & df$sex=='F'),]
+cat(
+    "Highest rated male player:", top_male_player$name, 'rated', top_male_player$rating,
+    "\nHighest rated female player:", top_female_player$name, 'rated', top_female_player$rating,
+    "\nDifference (M-F):", top_male_player$rating - top_female_player$rating
+)
+```
+
+We can try to answer yet another question,
+
+* Is this difference just due to random chance?
+* Or, is it (statistically) significant?
+
+### Hypothesis 
+
+Instead of comparing the highest rated players, we will take into account the 10 highest rated players. So, our test statistic becomes $M-F$ with $M = \frac{1}{10}\sum\limits_{i=1}^{10} M_{(i)}$ and $F = \frac{1}{10}\sum\limits_{i=1}^{10} F_{(i)}$ where $M_{(i)}$ and $F_{(i)}$ are ordered statistics. The hypothesis is then,
+
+* **Null Hypothesis:** Observed difference is due to random chance (M - F = 0)
+* **Alternative Hypothesis:** Observed difference is real (M - F > 0) and the top rated male players are significantly higher rated than the top rated female players
+
+### Observation
+
+```{r, echo = TRUE}
+T_ratings = df$rating   # All ratings
+M_ratings = df[df$sex=='M',]$rating   # Ratings of male players
+F_ratings = df[df$sex=='F',]$rating   # Ratings of female players
+```
+
+```{r, echo = TRUE}
+T_count = length(T_ratings)    # Total players
+M_count = length(M_ratings)    # Number of male players
+F_count = length(F_ratings)    # Number of female players
+```
+
+```{r, echo = FALSE}
+cat(
+  "Total players:", prettyNum(T_count, big.mark = ",", scientific = FALSE),
+  "\nNumber of male chess players:", prettyNum(M_count, big.mark = ",", scientific = FALSE),
+  "\nNumber of female chess players:", prettyNum(F_count, big.mark = ",", scientific = FALSE)
+)
+```
+
+```{r, echo = TRUE}
+M_observed = mean(tail(sort(M_ratings), size=10))   # Mean rating of male players
+F_observed = mean(tail(sort(F_ratings), size=10))   # Mean rating of female players
+t_observed = M_observed - F_observed    # Observed test statistic
+```
+
+```{r, echo = FALSE}
+cat(
+  "Observed mean rating of top male players:", prettyNum(M_observed, big.mark = ",", scientific = FALSE),
+  "\nObserved mean rating of top female players:", prettyNum(F_observed, big.mark = ",", scientific = FALSE),
+  "\nObserved test statistic:", prettyNum(t_observed, big.mark = ",", scientific = FALSE)
+)
+```
+
+### Permutation Step
+
+```{r, echo = TRUE}
+T_ratings = sample(T_ratings) # Shuffle all ratings
+M_ratings = T_ratings[1:M_count]  # Sample male ratings
+F_ratings = T_ratings[((M_count+1):T_count)]  # Sample female ratings
+```
+
+```{r, echo = TRUE}
+M = mean(tail(sort(M_ratings), size=10))   # Mean rating of male players
+F = mean(tail(sort(F_ratings), size=10))   # Mean rating of female players players
+t = M - F    # Observed test statistic
+```
+
+
+```{r, echo = FALSE}
+cat(
+  "(1) Resampled test statistic\t\t\t:", prettyNum(t, big.mark = ",", scientific = FALSE),
+  "\n(2) Observed test statistic\t\t\t:", prettyNum(t_observed, big.mark = ",", scientific = FALSE)
+)
+```
+
+### Repeating Permutation Step
+
+```{r, echo = TRUE}
+# Repeat steps a 'large number of times' (p)
+p = 1000 # Number of permutations
+perm_res = rep(0, p)  # Vector for saving permutation results
+for (i in 1:p) {
+  T_ratings = sample(T_ratings) # Shuffle all ratings
+  M_ratings = T_ratings[1:M_count]  # Sample male ratings
+  F_ratings = T_ratings[((M_count+1):T_count)]  # Sample female ratings players
+  M = mean(tail(sort(M_ratings), size=10))   # Mean rating of male players
+  F = mean(tail(sort(F_ratings), size=10))   # Mean rating of female players
+  t = M - F    # Observed test statistic
+  perm_res[i] = t
+}
+```
+
+### p-value
+
+```{r, echo = TRUE}
+# One way hypothesis test (Null: M - F = 0, Alternative: M - F > 0)
+extreme_count = sum(perm_res >= t_observed)
+```
+
+```{r, echo = FALSE}
+cat(
+    "Number of permutations\t\t\t:", prettyNum(p, big.mark = ",", scientific = FALSE),
+    "\nOne-way: Extreme count\t\t\t:", extreme_count,
+    "\nOne-way: Extreme ratio (p-value)\t:", extreme_count / p
+)
+```
+
+
+
+```{r, echo = FALSE, fig.width=6, fig.height=4, fig.align="center"}
+df2 = data.frame(perm_res=perm_res)
+plt = ggplot(df2, aes(x=perm_res)) +
+    geom_density(fill = "grey") +
+    xlim(min(df2$perm_res)-30, max(df2$perm_res)+30)
+d = ggplot_build(plt)$data[[1]]
+pval = extreme_count / p
+plt = plt +
+  labs(
+      title = paste("One-way Test # Perm. =", prettyNum(p, big.mark = ",", scientific = FALSE), ", p-value =", pval),
+      x = paste("Test Statistic (Observed:", prettyNum(t_observed, big.mark = ",", scientific = FALSE), ")"),
+      y = "Density"
+  ) +
+  theme(
+      plot.title = element_text(hjust = 0.5, face="bold"),
+      text=element_text(size=10),
+      panel.border = element_rect(colour = "black", fill=NA, size=1)
+  )
+plt
+```
+
+### Decision
+
+We conclude that top rated male players are significantly higher rated than the top rated female players.
+
+## Case of India: Top Players
+
+```{r echo=FALSE}
+df = read.csv("../data/standard_dec22frl_xml.csv")
+df = df[df$country=='IND',]
+```
+
+```{r, echo = FALSE}
+top_male_player = df[which(df$rating==max(df[df$sex=='M',]$rating) & df$sex=='M'),]
+top_female_player = df[which(df$rating==max(df[df$sex=='F',]$rating) & df$sex=='F'),]
+cat(
+    "Highest rated male player:", top_male_player$name, 'rated', top_male_player$rating,
+    "\nHighest rated female player:", top_female_player$name, 'rated', top_female_player$rating,
+    "\nDifference (M-F):", top_male_player$rating - top_female_player$rating
+)
+```
+
+### Observation
+
+```{r, echo = FALSE}
+T_ratings = df$rating   # All ratings
+M_ratings = df[df$sex=='M',]$rating   # Ratings of male players
+F_ratings = df[df$sex=='F',]$rating   # Ratings of female players
+```
+
+```{r, echo = FALSE}
+T_count = length(T_ratings)    # Total players
+M_count = length(M_ratings)    # Number of male players
+F_count = length(F_ratings)    # Number of female players
+```
+
+```{r, echo = FALSE}
+cat(
+  "Total players:", prettyNum(T_count, big.mark = ",", scientific = FALSE),
+  "\nNumber of male chess players:", prettyNum(M_count, big.mark = ",", scientific = FALSE),
+  "\nNumber of female chess players:", prettyNum(F_count, big.mark = ",", scientific = FALSE)
+)
+```
+
+```{r, echo = FALSE}
+M_observed = mean(tail(sort(M_ratings), size=10))   # Mean rating of male players
+F_observed = mean(tail(sort(F_ratings), size=10))   # Mean rating of female players
+t_observed = M_observed - F_observed    # Observed test statistic
+```
+
+```{r, echo = FALSE}
+cat(
+  "Observed mean rating of top male players:", prettyNum(M_observed, big.mark = ",", scientific = FALSE),
+  "\nObserved mean rating of top female players:", prettyNum(F_observed, big.mark = ",", scientific = FALSE),
+  "\nObserved test statistic:", prettyNum(t_observed, big.mark = ",", scientific = FALSE)
+)
+```
+
+```{r, echo = FALSE}
+# Repeat steps a 'large number of times' (p)
+p = 1000 # Number of permutations
+perm_res = rep(0, p)  # Vector for saving permutation results
+for (i in 1:p) {
+  T_ratings = sample(T_ratings) # Shuffle all ratings
+  M_ratings = T_ratings[1:M_count]  # Sample male ratings
+  F_ratings = T_ratings[((M_count+1):T_count)]  # Sample female ratings players
+  M = mean(tail(sort(M_ratings), size=10))   # Mean rating of male players
+  F = mean(tail(sort(F_ratings), size=10))   # Mean rating of female players
+  t = M - F    # Observed test statistic
+  perm_res[i] = t
+}
+```
+
+### p-value
+
+```{r, echo = FALSE}
+# One way hypothesis test (Null: M - F = 0, Alternative: M - F > 0)
+extreme_count = sum(perm_res >= t_observed)
+```
+
+```{r, echo = FALSE}
+cat(
+    "Number of permutations\t\t\t:", prettyNum(p, big.mark = ",", scientific = FALSE),
+    "\nOne-way: Extreme count\t\t\t:", extreme_count,
+    "\nOne-way: Extreme ratio (p-value)\t:", extreme_count / p
+)
+```
+
+
+```{r, echo = FALSE, fig.width=6, fig.height=4, fig.align="center"}
+df2 = data.frame(perm_res=perm_res)
+plt = ggplot(df2, aes(x=perm_res)) +
+    geom_density(fill = "grey") +
+    xlim(min(df2$perm_res)-30, max(df2$perm_res)+30)
+d = ggplot_build(plt)$data[[1]]
+pval = extreme_count / p
+plt = plt +
+      geom_area(data = subset(d, x > t_observed), aes(x=x, y=y), fill="#e18009") +
+  geom_vline(aes(xintercept = t_observed), color="red", linetype="dashed", size=.5) +
+  labs(
+      title = paste("Federation: IND, One-way Test # Perm. =", prettyNum(p, big.mark = ",", scientific = FALSE), ", p-value =", pval),
+      x = paste("Test Statistic (Observed:", prettyNum(round(t_observed, 2), big.mark = ",", scientific = FALSE), ")"),
+      y = "Density"
+  ) +
+  theme(
+      plot.title = element_text(hjust = 0.5, face="bold"),
+      text=element_text(size=10),
+      panel.border = element_rect(colour = "black", fill=NA, size=1)
+  )
+plt
+```
+
+### Decision
+
+We conclude a lack of evidence to support the claim that in India, the top rated male players are outperforming the top rated female players. 
+
+## Conclusion
+

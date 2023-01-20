@@ -11,3 +11,4 @@ data/
 **/*.Rproj
 **/_bookdown_files/
 **/packages.bib
+.Rproj.user
