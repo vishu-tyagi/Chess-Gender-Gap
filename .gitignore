@@ -5,4 +5,7 @@
 **/*.pyc
 **/*.ipynb_checkpoints
 data/
-.Rproj.user
+Bookdown/.Rhistory
+Bookdown/.RData
+Bookdown/.Rproj.user
+Bookdown/*.Rproj

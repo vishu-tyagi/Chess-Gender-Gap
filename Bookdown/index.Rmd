@@ -4,23 +4,13 @@ date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
 ---
 
-# Down the rabbit-hole
+```{r, setup, echo = FALSE}
+library(tidyverse)
+library(ggplot2)
+```
 
-## Heading
+# Is there gender gap in Chess?
 
-heading content
+## FIDE Ratings
 
-### Sub-heading
-
-sub-heading content
-
-some-more-content
-
-## 2nd Heading?
-
-with content
-
-### 2nd Sub?
-
-no content
-
+I downloaded the [Dec 2022, FIDE Standard rating list](http://ratings.fide.com/download/standard_dec22frl_xml.zip) in XML format and parsed it as CSV in Python and removed all junior players born after 2002. See here for the [github repository](https://github.com/vishu-tyagi/Chess-Gender-Gap). This is how it looks like,
