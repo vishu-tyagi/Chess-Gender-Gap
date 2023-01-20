@@ -5,4 +5,7 @@
 **/*.pyc
 **/*.ipynb_checkpoints
 data/
+.Rhistory
+.RData
 .Rproj.user
+*.Rproj
