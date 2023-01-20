@@ -1,5 +1,4 @@
 --- 
-title: "A Minimal Book Example"
 author: "John Doe"
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
@@ -14,7 +13,3 @@ description: |
 link-citations: yes
 github-repo: rstudio/bookdown-demo
 ---
-
-# About
-
-This is the index file

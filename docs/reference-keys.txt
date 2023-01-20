@@ -2,9 +2,9 @@ fig:nice-fig
 tab:nice-tab
 eq:binom
 thm:tri
-about
-hello-bookdown
+is-there-gender-gap-in-chess
 a-section
+a-subsection
 cross
 chapters-and-sub-chapters
 captioned-figures-and-tables
