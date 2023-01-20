@@ -14,3 +14,15 @@ library(ggplot2)
 ## FIDE Ratings
 
 I downloaded the [Dec 2022, FIDE Standard rating list](http://ratings.fide.com/download/standard_dec22frl_xml.zip) in XML format and parsed it as CSV in Python and removed all junior players born after 2002. See here for the [github repository](https://github.com/vishu-tyagi/Chess-Gender-Gap). This is how it looks like,
+
+```{r, echo = FALSE}
+df = read.csv("../data/standard_dec22frl_xml.csv")
+head(df, n=3)
+```
+
+```{r, echo = FALSE}
+nrows = nrow(df)
+cat(
+    "Number of players:", prettyNum(nrows, big.mark = ",", scientific = FALSE)
+)
+```
