@@ -1,8 +1,8 @@
 book_filename: "bookdownproj"
 output_dir: ../docs
 delete_merged_file: true
-edit: https://github.com/vishu-tyagi/Chess-Gender-Gap/edit/book/Bookdown/%s
-view: https://github.com/vishu-tyagi/Chess-Gender-Gap/blob/book/Bookdown/%s
+edit: https://github.com/vishu-tyagi/Chess-Gender-Gap/edit/main/Bookdown/%s
+view: https://github.com/vishu-tyagi/Chess-Gender-Gap/blob/main/Bookdown/%s
 language:
   ui:
     chapter_name: "Chapter "
