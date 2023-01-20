@@ -1,9 +1,11 @@
 fig:nice-fig
 tab:nice-tab
 eq:binom
-introduction
+about
+usage
+render-book
+preview-book
 hello-bookdown
-a-section
 cross
 chapters-and-sub-chapters
 captioned-figures-and-tables
