@@ -1,6 +1,8 @@
 down-the-rabbit-hole
 heading
 sub-heading
+nd-heading
+nd-sub
 is-this-a-chapter
 isheading
 issub-heading
