@@ -1,42 +1,13 @@
-# Chess-Gender-Gap
+Welcome! 
 
-## Instructions
+This is a minimal example of a book based on R Markdown and **bookdown** (https://github.com/rstudio/bookdown). 
 
-#### Move into top-level directory
-```
-cd Chess-Gender-Gap
+This template provides a skeleton file structure that you can edit to create your book. 
 
-```
+The contents inside the .Rmd files provide some pointers to help you get started, but feel free to also delete the content in each file and start fresh.
 
-#### Install environment
-```
-conda env create -f environment.yml
+Additional resources:
 
-```
+The **bookdown** book: https://bookdown.org/yihui/bookdown/
 
-#### Activate environment
-```
-conda activate chess-gender-gap
-
-```
-
-#### Install package
-```
-pip install -e src/chess-gender-gap
-
-```
-
-Including the optional -e flag will install the package in "editable" mode, meaning that instead of copying the files into your virtual environment, a symlink will be created to the files where they are.
-
-#### Fetch XML data
-```
-python -m chess_gender_gap fetch
-
-```
-
-#### Run jupyter server
-```
-jupyter notebook notebooks/
-
-```
-You can now use the jupyter server or `chess-gender-gap` kernel to run notebooks.
+The **bookdown** package reference site: https://pkgs.rstudio.com/bookdown
