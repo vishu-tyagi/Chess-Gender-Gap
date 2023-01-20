@@ -1,0 +1,10 @@
+bookdown::gitbook:
+  css: style.css
+  config:
+    toc:
+      before: |
+        <li><a href="./">Chess Gender Gap</a></li>
+      after: |
+        <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+    edit: https://github.com/vishu-tyagi/Chess-Gender-Gap/edit/BRANCH/%s
+    download: ["pdf", "epub"]
