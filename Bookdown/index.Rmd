@@ -1,6 +1,6 @@
 ---
-author: "Vishu Tyagi"
-date: "`r Sys.Date()`"
+title: Gender Gap in Chess
+author: "Vishu Tyagi (vt2353@columbia.edu)"
 site: bookdown::bookdown_site
 ---
 
@@ -10,6 +10,8 @@ library(ggplot2)
 ```
 
 # Is there gender gap in Chess?
+
+This work is inspired by the Chessbase article, [What gender gap in chess?](https://en.chessbase.com/post/what-gender-gap-in-chess) by Prof. Ma at New York University who talked about the gender gap at top-level chess. I've tried adding a bit of statistical rigour; apologies in advance if I tread otherwise; thoughts and suggestions are always welcomed and much appreciated!
 
 ## FIDE Ratings
 
@@ -73,11 +75,11 @@ Keeping this in mind, we devise the following one-sided test to answer the resea
 
 ### Test Statistic
 
-Under the Null Hypothesis, all ratings are independent and identically distributed. If we sample (without replacement) as many ratings as there are female players, the sampled ratings are equally likely to be the ratings of female players.
+Under the Null Hypothesis, all ratings are independent and identically distributed. If we randomly choose (without replacement) as many ratings as there are female players, the chosen ratings are equally likely to be the ratings of female players.
 
 Because the alternative hypothesis is that ratings from distribution F tend to be smaller than ratings from distribution M, a reasonable test would be to
 
-- reject the null hypothesis if  the sum of sampled ratings is smaller than might be expected by chance
+* reject the null hypothesis if the sum of actual ratings of female players is smaller than the sum of randomly chosen ratings
 
 Hence, we choose $\sum\limits_i F_i$ as our test statistic where $F_i$ are ratings of female players
 
@@ -172,7 +174,7 @@ cat(
 
 ```{r, echo = TRUE}
 # Repeat steps a 'large number of times' (p)
-p = 1000 # Number of permutations
+p = 10000 # Number of permutations
 perm_res = rep(0, p)  # Vector for saving permutation results
 for (i in 1:p) {
   F_ratings = sample(T_ratings, size=F_count, replace=FALSE)  # Sample female ratings
@@ -286,7 +288,7 @@ cat(
 ```{r, echo = FALSE}
 # Repeat steps a 'large number of times' (p)
 T_ratings = sample(T_ratings)     # Shuffle all ratings once
-p = 1000 # Number of permutations
+p = 10000 # Number of permutations
 perm_res = rep(0, p)  # Vector for saving permutation results
 for (i in 1:p) {
   F_ratings = sample(T_ratings, size=F_count, replace=FALSE)  # Sample female ratings
@@ -334,7 +336,7 @@ plt
 
 ### Decision
 
-We conclude lack of evidence to support the claim that in India, male players tend to have a larger rating than female players. This makes me proud as an avid follower of the chess scene in India.
+We conclude lack of evidence to support the claim that in India, male players tend to have a larger rating than female players.
 
 ## Comparing Top Players
 
@@ -361,7 +363,7 @@ We can try to answer yet another question,
 
 ### Hypothesis 
 
-Instead of comparing the highest rated players, we will take into account the 10 highest rated players. So, our test statistic becomes $M-F$ with $M = \frac{1}{10}\sum\limits_{i=1}^{10} M_{(i)}$ and $F = \frac{1}{10}\sum\limits_{i=1}^{10} F_{(i)}$ where $M_{(i)}$ and $F_{(i)}$ are ordered statistics. The hypothesis is then,
+Instead of comparing only the highest rated players, we will take into account the 10 highest rated players, which is more robust against outliers. So, our test statistic becomes $M-F$ with $M = \frac{1}{10}\sum\limits_{i=1}^{10} M_{(i)}$ and $F = \frac{1}{10}\sum\limits_{i=1}^{10} F_{(i)}$ where $M_{(i)}$ and $F_{(i)}$ are ordered statistics. The hypothesis is then,
 
 * **Null Hypothesis:** Observed difference is due to random chance (M - F = 0)
 * **Alternative Hypothesis:** Observed difference is real (M - F > 0) and the top rated male players are significantly higher rated than the top rated female players
@@ -428,7 +430,7 @@ cat(
 
 ```{r, echo = TRUE}
 # Repeat steps a 'large number of times' (p)
-p = 1000 # Number of permutations
+p = 10000 # Number of permutations
 perm_res = rep(0, p)  # Vector for saving permutation results
 for (i in 1:p) {
   T_ratings = sample(T_ratings) # Shuffle all ratings
@@ -494,8 +496,8 @@ df = df[df$country=='IND',]
 top_male_player = df[which(df$rating==max(df[df$sex=='M',]$rating) & df$sex=='M'),]
 top_female_player = df[which(df$rating==max(df[df$sex=='F',]$rating) & df$sex=='F'),]
 cat(
-    "Highest rated male player:", top_male_player$name, 'rated', top_male_player$rating,
-    "\nHighest rated female player:", top_female_player$name, 'rated', top_female_player$rating,
+    "Highest rated Indian male player:", top_male_player$name, 'rated', top_male_player$rating,
+    "\nHighest rated Indian female player:", top_female_player$name, 'rated', top_female_player$rating,
     "\nDifference (M-F):", top_male_player$rating - top_female_player$rating
 )
 ```
@@ -538,7 +540,7 @@ cat(
 
 ```{r, echo = FALSE}
 # Repeat steps a 'large number of times' (p)
-p = 1000 # Number of permutations
+p = 10000 # Number of permutations
 perm_res = rep(0, p)  # Vector for saving permutation results
 for (i in 1:p) {
   T_ratings = sample(T_ratings) # Shuffle all ratings
@@ -592,6 +594,14 @@ plt
 
 ### Decision
 
-We conclude a lack of evidence to support the claim that in India, the top rated male players are outperforming the top rated female players. 
+We conclude a lack of evidence to support the claim that in India, the top rated male players are significantly higher rated than the top rated female players. 
 
 ## Conclusion
+
+We saw that in the case of India, the gender gap between the ratings of male and female players is not significant and can be attributed to the low participation of women in Chess. 
+
+However, the same cannot be said for the global scene. We saw that the ratings of male players tend to be significantly higher than those of females. 
+
+However, this does not mean men are inherently better at Chess than women. There are a lot of other factors, including systemic societal factors, that are at play here which are not taken into account in this procedure.
+
+All in all, as an Indian and an avid follower of Chess, it makes me incredibly proud that Indian women are performing so well!

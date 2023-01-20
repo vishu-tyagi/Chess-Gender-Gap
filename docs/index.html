@@ -4,26 +4,25 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 1 Is there gender gap in Chess? | bookdownproj.knit</title>
-  <meta name="description" content="" />
+  <title>Gender Gap in Chess</title>
+  <meta name="description" content="Gender Gap in Chess" />
   <meta name="generator" content="bookdown 0.30 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 1 Is there gender gap in Chess? | bookdownproj.knit" />
+  <meta property="og:title" content="Gender Gap in Chess" />
   <meta property="og:type" content="book" />
   
   
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 1 Is there gender gap in Chess? | bookdownproj.knit" />
+  <meta name="twitter:title" content="Gender Gap in Chess" />
   
   
   
 
-<meta name="author" content="Vishu Tyagi" />
+<meta name="author" content="Vishu Tyagi (vt2353@columbia.edu)" />
 
 
-<meta name="date" content="2023-01-20" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -191,7 +190,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
       <div class="body-inner">
         <div class="book-header" role="navigation">
           <h1>
-            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./"></a>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Gender Gap in Chess</a>
           </h1>
         </div>
 
@@ -199,10 +198,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<!--bookdown:title:end-->
-<!--bookdown:title:start-->
+<div id="header">
+<h1 class="title">Gender Gap in Chess</h1>
+<p class="author"><em>Vishu Tyagi (<a href="mailto:vt2353@columbia.edu" class="email">vt2353@columbia.edu</a>)</em></p>
+</div>
 <div id="is-there-gender-gap-in-chess" class="section level1 hasAnchor" number="1">
 <h1><span class="header-section-number">Chapter 1</span> Is there gender gap in Chess?<a href="#is-there-gender-gap-in-chess" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>This work is inspired by the Chessbase article, <a href="https://en.chessbase.com/post/what-gender-gap-in-chess">What gender gap in chess?</a> by Prof. Ma at New York University who talked about the gender gap at top-level chess. I’ve tried adding a bit of statistical rigour; apologies in advance if I tread otherwise; thoughts and suggestions are always welcomed and much appreciated!</p>
 <div id="fide-ratings" class="section level2 hasAnchor" number="1.1">
 <h2><span class="header-section-number">1.1</span> FIDE Ratings<a href="#fide-ratings" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>I downloaded the <a href="http://ratings.fide.com/download/standard_dec22frl_xml.zip">Dec 2022, FIDE Standard rating list</a> in XML format and parsed it as CSV in Python and removed all junior players born after 2002. See here for the <a href="https://github.com/vishu-tyagi/Chess-Gender-Gap">github repository</a>. This is how it looks like,</p>
@@ -235,10 +237,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul>
 <div id="test-statistic" class="section level3 hasAnchor" number="1.2.1">
 <h3><span class="header-section-number">1.2.1</span> Test Statistic<a href="#test-statistic" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Under the Null Hypothesis, all ratings are independent and identically distributed. If we sample (without replacement) as many ratings as there are female players, the sampled ratings are equally likely to be the ratings of female players.</p>
+<p>Under the Null Hypothesis, all ratings are independent and identically distributed. If we randomly choose (without replacement) as many ratings as there are female players, the chosen ratings are equally likely to be the ratings of female players.</p>
 <p>Because the alternative hypothesis is that ratings from distribution F tend to be smaller than ratings from distribution M, a reasonable test would be to</p>
 <ul>
-<li>reject the null hypothesis if the sum of sampled ratings is smaller than might be expected by chance</li>
+<li>reject the null hypothesis if the sum of actual ratings of female players is smaller than the sum of randomly chosen ratings</li>
 </ul>
 <p>Hence, we choose <span class="math inline">\(\sum\limits_i F_i\)</span> as our test statistic where <span class="math inline">\(F_i\)</span> are ratings of female players</p>
 </div>
@@ -320,7 +322,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="repeating-permutation-step" class="section level3 hasAnchor" number="1.3.3">
 <h3><span class="header-section-number">1.3.3</span> Repeating Permutation Step<a href="#repeating-permutation-step" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Repeat steps a &#39;large number of times&#39; (p)</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>p <span class="ot">=</span> <span class="dv">1000</span> <span class="co"># Number of permutations</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>p <span class="ot">=</span> <span class="dv">10000</span> <span class="co"># Number of permutations</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>perm_res <span class="ot">=</span> <span class="fu">rep</span>(<span class="dv">0</span>, p)  <span class="co"># Vector for saving permutation results</span></span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>p) {</span>
 <span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  F_ratings <span class="ot">=</span> <span class="fu">sample</span>(T_ratings, <span class="at">size=</span>F_count, <span class="at">replace=</span><span class="cn">FALSE</span>)  <span class="co"># Sample female ratings</span></span>
@@ -332,7 +334,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h3><span class="header-section-number">1.3.4</span> p-value<a href="#p-value-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># One way hypothesis test (Null: M = F, Alternative: M &gt; F)</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>extreme_count <span class="ot">=</span> <span class="fu">sum</span>(perm_res <span class="sc">&lt;=</span> t_observed)</span></code></pre></div>
-<pre><code>## Number of permutations           : 1,000 
+<pre><code>## Number of permutations           : 10,000 
 ## One-way: Extreme count           : 0 
 ## One-way: Extreme ratio (p-value) : 0</code></pre>
 <p><img src="bookdownproj_files/figure-html/unnamed-chunk-14-1.png" width="576" style="display: block; margin: auto;" /></p>
@@ -357,14 +359,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="p-value-2" class="section level3 hasAnchor" number="1.4.2">
 <h3><span class="header-section-number">1.4.2</span> p-value<a href="#p-value-2" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<pre><code>## Number of permutations           : 1,000 
-## One-way: Extreme count           : 116 
-## One-way: Extreme ratio (p-value) : 0.116</code></pre>
+<pre><code>## Number of permutations           : 10,000 
+## One-way: Extreme count           : 1289 
+## One-way: Extreme ratio (p-value) : 0.1289</code></pre>
 <p><img src="bookdownproj_files/figure-html/unnamed-chunk-25-1.png" width="576" style="display: block; margin: auto;" /></p>
 </div>
 <div id="decision-2" class="section level3 hasAnchor" number="1.4.3">
 <h3><span class="header-section-number">1.4.3</span> Decision<a href="#decision-2" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>We conclude lack of evidence to support the claim that in India, male players tend to have a larger rating than female players. This makes me proud as an avid follower of the chess scene in India.</p>
+<p>We conclude lack of evidence to support the claim that in India, male players tend to have a larger rating than female players.</p>
 </div>
 </div>
 <div id="comparing-top-players" class="section level2 hasAnchor" number="1.5">
@@ -380,7 +382,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul>
 <div id="hypothesis-1" class="section level3 hasAnchor" number="1.5.1">
 <h3><span class="header-section-number">1.5.1</span> Hypothesis<a href="#hypothesis-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Instead of comparing the highest rated players, we will take into account the 10 highest rated players. So, our test statistic becomes <span class="math inline">\(M-F\)</span> with <span class="math inline">\(M = \frac{1}{10}\sum\limits_{i=1}^{10} M_{(i)}\)</span> and <span class="math inline">\(F = \frac{1}{10}\sum\limits_{i=1}^{10} F_{(i)}\)</span> where <span class="math inline">\(M_{(i)}\)</span> and <span class="math inline">\(F_{(i)}\)</span> are ordered statistics. The hypothesis is then,</p>
+<p>Instead of comparing only the highest rated players, we will take into account the 10 highest rated players, which is more robust against outliers. So, our test statistic becomes <span class="math inline">\(M-F\)</span> with <span class="math inline">\(M = \frac{1}{10}\sum\limits_{i=1}^{10} M_{(i)}\)</span> and <span class="math inline">\(F = \frac{1}{10}\sum\limits_{i=1}^{10} F_{(i)}\)</span> where <span class="math inline">\(M_{(i)}\)</span> and <span class="math inline">\(F_{(i)}\)</span> are ordered statistics. The hypothesis is then,</p>
 <ul>
 <li><strong>Null Hypothesis:</strong> Observed difference is due to random chance (M - F = 0)</li>
 <li><strong>Alternative Hypothesis:</strong> Observed difference is real (M - F &gt; 0) and the top rated male players are significantly higher rated than the top rated female players</li>
@@ -412,13 +414,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>M <span class="ot">=</span> <span class="fu">mean</span>(<span class="fu">tail</span>(<span class="fu">sort</span>(M_ratings), <span class="at">size=</span><span class="dv">10</span>))   <span class="co"># Mean rating of male players</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>F <span class="ot">=</span> <span class="fu">mean</span>(<span class="fu">tail</span>(<span class="fu">sort</span>(F_ratings), <span class="at">size=</span><span class="dv">10</span>))   <span class="co"># Mean rating of female players players</span></span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>t <span class="ot">=</span> M <span class="sc">-</span> F    <span class="co"># Observed test statistic</span></span></code></pre></div>
-<pre><code>## (1) Resampled test statistic         : 85.66667 
+<pre><code>## (1) Resampled test statistic         : 123 
 ## (2) Observed test statistic          : 198.1667</code></pre>
 </div>
 <div id="repeating-permutation-step-1" class="section level3 hasAnchor" number="1.5.4">
 <h3><span class="header-section-number">1.5.4</span> Repeating Permutation Step<a href="#repeating-permutation-step-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Repeat steps a &#39;large number of times&#39; (p)</span></span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>p <span class="ot">=</span> <span class="dv">1000</span> <span class="co"># Number of permutations</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>p <span class="ot">=</span> <span class="dv">10000</span> <span class="co"># Number of permutations</span></span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>perm_res <span class="ot">=</span> <span class="fu">rep</span>(<span class="dv">0</span>, p)  <span class="co"># Vector for saving permutation results</span></span>
 <span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>p) {</span>
 <span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  T_ratings <span class="ot">=</span> <span class="fu">sample</span>(T_ratings) <span class="co"># Shuffle all ratings</span></span>
@@ -434,7 +436,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h3><span class="header-section-number">1.5.5</span> p-value<a href="#p-value-3" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># One way hypothesis test (Null: M - F = 0, Alternative: M - F &gt; 0)</span></span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>extreme_count <span class="ot">=</span> <span class="fu">sum</span>(perm_res <span class="sc">&gt;=</span> t_observed)</span></code></pre></div>
-<pre><code>## Number of permutations           : 1,000 
+<pre><code>## Number of permutations           : 10,000 
 ## One-way: Extreme count           : 0 
 ## One-way: Extreme ratio (p-value) : 0</code></pre>
 <p><img src="bookdownproj_files/figure-html/unnamed-chunk-39-1.png" width="576" style="display: block; margin: auto;" /></p>
@@ -446,8 +448,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="case-of-india-top-players" class="section level2 hasAnchor" number="1.6">
 <h2><span class="header-section-number">1.6</span> Case of India: Top Players<a href="#case-of-india-top-players" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<pre><code>## Highest rated male player: Anand, Viswanathan rated 2754 
-## Highest rated female player: Koneru, Humpy rated 2572 
+<pre><code>## Highest rated Indian male player: Anand, Viswanathan rated 2754 
+## Highest rated Indian female player: Koneru, Humpy rated 2572 
 ## Difference (M-F): 182</code></pre>
 <div id="observation-3" class="section level3 hasAnchor" number="1.6.1">
 <h3><span class="header-section-number">1.6.1</span> Observation<a href="#observation-3" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -460,18 +462,22 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="p-value-4" class="section level3 hasAnchor" number="1.6.2">
 <h3><span class="header-section-number">1.6.2</span> p-value<a href="#p-value-4" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<pre><code>## Number of permutations           : 1,000 
-## One-way: Extreme count           : 128 
-## One-way: Extreme ratio (p-value) : 0.128</code></pre>
+<pre><code>## Number of permutations           : 10,000 
+## One-way: Extreme count           : 1351 
+## One-way: Extreme ratio (p-value) : 0.1351</code></pre>
 <p><img src="bookdownproj_files/figure-html/unnamed-chunk-50-1.png" width="576" style="display: block; margin: auto;" /></p>
 </div>
 <div id="decision-4" class="section level3 hasAnchor" number="1.6.3">
 <h3><span class="header-section-number">1.6.3</span> Decision<a href="#decision-4" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>We conclude a lack of evidence to support the claim that in India, the top rated male players are outperforming the top rated female players.</p>
+<p>We conclude a lack of evidence to support the claim that in India, the top rated male players are significantly higher rated than the top rated female players.</p>
 </div>
 </div>
 <div id="conclusion" class="section level2 hasAnchor" number="1.7">
 <h2><span class="header-section-number">1.7</span> Conclusion<a href="#conclusion" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>We saw that in the case of India, the gender gap between the ratings of male and female players is not significant and can be attributed to the low participation of women in Chess.</p>
+<p>However, the same cannot be said for the global scene. We saw that the ratings of male players tend to be significantly higher than those of females.</p>
+<p>However, this does not mean men are inherently better at Chess than women. There are a lot of other factors, including systemic societal factors, that are at play here which are not taken into account in this procedure.</p>
+<p>All in all, as an Indian and an avid follower of Chess, it makes me incredibly proud that Indian women are performing so well!</p>
 
 </div>
 </div>
