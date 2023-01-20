@@ -1,8 +1,15 @@
 ---
-title: "Is there gender gap in Chess?"
 author: "Vishu Tyagi"
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
 ---
 
 # Down the rabbit-hole
+
+## Heading
+
+heading content
+
+### Sub-heading
+
+sub-heading content
